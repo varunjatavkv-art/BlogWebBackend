@@ -5,6 +5,7 @@ import "dotenv/config";
 // import routers
 import registrationRouter from "./routes/registration.js";
 import loginRouter from "./routes/login.js";
+import { verifyToken } from "./middleware/authMiddleware.js";
 
 const app = express();
 app.use(express.json());
@@ -12,14 +13,13 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = 8080;
 
-app.get("", (req, res) => {
-  try {
-    res.send("Hello World!!");
-  } catch (error) {}
+app.get("/", verifyToken ,(req, res) => {
+ res.status(200).json({ message: 'Protected route accessed' });
 });
 
-app.use("/api", registrationRouter);
-app.use("/api",loginRouter)
+app.use("/", registrationRouter);
+app.use("/",loginRouter);
+
 
 MongoDBConnection()
   .then(() => {

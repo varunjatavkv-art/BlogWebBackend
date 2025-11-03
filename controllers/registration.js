@@ -8,8 +8,6 @@ export const registration =  async(req,res) => {
         const salt = await bcrypt.genSaltSync(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
-        console.log(hashedPassword);
-        
         const user = await User({
             Name: name,
             Email:email,
@@ -17,10 +15,7 @@ export const registration =  async(req,res) => {
             UserName: username,
             Password: hashedPassword
         });
-
-        console.log(user);
         
-
         await user.save();
         return res.status(201).json({message: "User has been created Successfully !!", data: user});
     } catch (error) {

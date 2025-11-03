@@ -6,10 +6,7 @@ import jwt from 'jsonwebtoken';
 export const login = async (req,res) => {
     try {
          const { username, password } = req.body;
-         console.log("username: ",username);
-         console.log("password: ", password);
-         
-         
+    
          if(username == ""){
            return res.status(404).json({error: "Username field is empty !!"});
          }
@@ -27,7 +24,7 @@ export const login = async (req,res) => {
             expiresIn: '1h',
          });
 
-         res.status(200).json({token: token});
+         res.status(200).json({token: token , userRole: user.UserRole});
 
     } catch (error) {
         console.log(error);

@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 
 const BlogSchema = mongoose.Schema({
-  imageUrl : {
-    type: String, required: true, default: ""
-  },  
+  imageUrl: {
+    type: String,
+    required: true,
+    default: "",
+  },
   title: {
     type: String,
     required: true,
@@ -39,6 +41,11 @@ const BlogSchema = mongoose.Schema({
     required: true,
     default: "1",
     enum: ["0", "1"],
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // References the 'User' model
+    required: true,
   },
 });
 

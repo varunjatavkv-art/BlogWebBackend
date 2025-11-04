@@ -2,6 +2,13 @@ import Blog from "../models/Blogs.js";
 
 export const addBlog = async (req, res) => {
   try {
+    const authorId = req.userId; 
+
+    if (!authorId) {
+      return res
+        .status(401)
+        .json({ error: "User not authenticated or ID missing." });
+    }
     const { filename } = req.file;
     const {
       title,
@@ -21,6 +28,7 @@ export const addBlog = async (req, res) => {
       edited_at,
       created_by,
       edited_by,
+      author: authorId,
     });
     await blog.save();
     return res.status(201).json({
@@ -33,14 +41,18 @@ export const addBlog = async (req, res) => {
 };
 
 export const getBlogs = async (req, res) => {
-    // console.log(req);
-    
+  
+  const authorId = req.userId; 
+  if (!authorId) {
+    return res
+      .status(401)
+      .json({ error: "User not authenticated or ID missing." });
+  }
+
   try {
     const { page = 1, limit = 10, searchQuery, status } = req.query;
 
     const skip = (page - 1) * limit;
-
-    const totalBlogs = await Blog.countDocuments();
 
     let filter = {};
 
@@ -57,7 +69,11 @@ export const getBlogs = async (req, res) => {
     if (status) {
       filter["status"] = status;
     }
+    if (authorId) {
+      filter["author"] = authorId;
+    }
 
+    const totalBlogs = await Blog.countDocuments(filter);
     const blog = await Blog.find(filter).skip(skip).limit(limit);
 
     return res.status(200).json({
@@ -66,15 +82,22 @@ export const getBlogs = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    
+
     return res.status(404).json({ error });
   }
 };
 
 export const getSingleBlog = async (req, res) => {
+
+  const authorId = req.userId; 
+  if (!authorId) {
+    return res
+      .status(401)
+      .json({ error: "User not authenticated or ID missing." });
+  }
   try {
     const { id } = req.params;
-    const singleBlog = await Blog.findOne({ _id: id });
+    const singleBlog = await Blog.findOne({ _id: id , author:authorId });
     res.status(200).json({
       message: "fetched single blog successfully",
       singleBlog: singleBlog,
@@ -85,9 +108,15 @@ export const getSingleBlog = async (req, res) => {
 };
 
 export const deleteBlog = async (req, res) => {
+     const authorId = req.userId; 
+  if (!authorId) {
+    return res
+      .status(401)
+      .json({ error: "User not authenticated or ID missing." });
+  }
   try {
     const { id } = req.params;
-    const deletedBlog = await Blog.deleteOne({ _id: id });
+    const deletedBlog = await Blog.deleteOne({ _id: id , author:authorId});
     if (deletedBlog.deleteCount == 0) {
       return res.status(404).json({ error: "Blog not found" });
     }
@@ -101,6 +130,14 @@ export const deleteBlog = async (req, res) => {
 };
 
 export const updateBlog = async (req, res) => {
+  const authorId = req.userId;
+  
+  if (!authorId) {
+    return res
+      .status(401)
+      .json({ error: "User not authenticated or ID missing." });
+  }
+
   try {
     const { id } = req.params;
 
@@ -127,6 +164,7 @@ export const updateBlog = async (req, res) => {
           edited_at,
           created_by,
           edited_by,
+          author: authorId
         },
       },
       { upsert: true }

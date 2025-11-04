@@ -2,8 +2,7 @@ import Blog from "../models/Blogs.js";
 
 export const addBlog = async (req, res) => {
   try {
-    const authorId = req.userId; 
-
+    const authorId = req.userId;
     if (!authorId) {
       return res
         .status(401)
@@ -19,6 +18,7 @@ export const addBlog = async (req, res) => {
       created_by,
       edited_by,
     } = req.body;
+
     const blog = await Blog({
       imageUrl: filename,
       title,
@@ -33,7 +33,7 @@ export const addBlog = async (req, res) => {
     await blog.save();
     return res.status(201).json({
       message: "New Blog has been success fully created !!",
-      blog: blog,
+      data: blog,
     });
   } catch (error) {
     return res.status(404).json({ error });

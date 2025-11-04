@@ -29,13 +29,13 @@ app.get("/", verifyToken ,(req, res) => {
 
 app.use("/", registrationRouter);
 app.use("/",loginRouter);
-app.use("/blog", blogRouter);
+app.use("/blog",verifyToken, blogRouter);
 
 
 MongoDBConnection()
   .then(() => {
     app.listen(process.env.PORT || port, () => {
-      console.log("Server is running on " + port);
+      console.log("Server is running on " + process.env.PORT || port);
     });
   })
   .catch((error) => {
